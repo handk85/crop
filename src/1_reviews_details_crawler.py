@@ -1,26 +1,27 @@
 # this script downloads the JSON files containing the details of every review in a certain community
 # the reviews JSON files are saved in the 'reviews_details' dir
 
-import configparser
+import logging
 import os
-import socket
+from logger import init_logger
+from commons import get_repo_name, load_config, filter_json
 from urllib.request import *
 
-socket.setdefaulttimeout(50)
-config = configparser.ConfigParser()
-config.read("Eclipse_settings.ini")
+repo_name = get_repo_name()
+init_logger("%s-reviews-detail.log" % repo_name)
+config = load_config(repo_name)
 
-COMMUNITY = config['DETAILS']['community']
-REVIEW_URL = config['DETAILS']['review_json_url']
-START_INDEX = int(config['DETAILS']['start_index'])
-END_INDEX = int(config['DETAILS']['end_index']) + 1
+COMMUNITY = config['community']
+REVIEW_URL = config['review_json_url']
+START_INDEX = int(config['start_index'])
+END_INDEX = int(config['end_index']) + 1
 
 # create the reviews_details directory if it does not exist
-if os.path.isdir("reviews_details") == False:
+if not os.path.isdir("reviews_details"):
     os.mkdir("reviews_details")
 
 # create the directory to store the reviews details for the community if it does not exist
-if os.path.isdir("reviews_details/" + COMMUNITY) == False:
+if not os.path.isdir("reviews_details/" + COMMUNITY):
     os.mkdir("reviews_details/" + COMMUNITY)
 
 for i in range(START_INDEX, END_INDEX):
@@ -34,17 +35,12 @@ for i in range(START_INDEX, END_INDEX):
 
     # if any error in downloading the JSON, skip to next review
     try:
-        print("Downloading JSON for review " + str(i) + " from " + COMMUNITY)
+        logging.info("%s %s", file_name, review_url)
         resp = urlopen(review_url)
-    except:
+    except Exception as e:
+        logging.error(e, exc_info=True)
         continue
 
-    json = open(file_name, "w")
-    content = resp.read().decode("utf-8", errors="ignore")
-
-    # JSONs returned by the Gerrit API usually have a non-standard starting line that needs to be filtered
-    if content.startswith(")]}'"):
-        content = "\n".join(content.split("\n")[1:])
-
-    json.write(content)
-    json.close()
+    content = filter_json(resp)
+    with open(file_name, "w") as f:
+        f.write(content)
