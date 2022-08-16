@@ -24,7 +24,7 @@ if not os.path.isdir("reviews_details"):
 if not os.path.isdir("reviews_details/" + COMMUNITY):
     os.mkdir("reviews_details/" + COMMUNITY)
 
-for i in range(START_INDEX, END_INDEX):
+for i in range(START_INDEX, END_INDEX, -1 if START_INDEX > END_INDEX else 1):
     file_name = "reviews_details/" + COMMUNITY + "/%s.json" % i
 
     # if JSON file is already downloaded, skip to next review

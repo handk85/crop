@@ -1,3 +1,6 @@
+# I am not sure whether this script is necessary.
+# Should we keep this script?
+
 # this script downloads the JSON files containing the details of every revision of the project specified in the settings
 # the revision JSON files are saved in the 'revisions_details' dir
 

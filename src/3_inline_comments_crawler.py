@@ -12,7 +12,7 @@ import logging
 
 repo_name = get_repo_name()
 config = load_config(repo_name)
-init_logger("%s-revision_details.log" % repo_name)
+init_logger("%s-inline-comments.log" % repo_name)
 
 COMMUNITY = config['community']
 PROJECT_REVIEW_JSON = config['project_review_json']
